@@ -8,6 +8,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
@@ -58,13 +59,20 @@ class AlarmService : Service() {
         mediaPlayer = MediaPlayer().apply {
             setAudioStreamType(AudioManager.STREAM_ALARM)
             try {
-                val soundUri = if (soundUriString.isNullOrEmpty()) {
-                    // Provide a default sound from res/raw
-                    Uri.parse("android.resource://$packageName/${R.raw.default_alarm}")
+                val soundUri: Uri? = if (soundUriString.isNullOrEmpty()) {
+                    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
                 } else {
                     Uri.parse(soundUriString)
                 }
-                setDataSource(applicationContext, soundUri)
+
+                if (soundUri == null) {
+                    // Fallback to notification sound if no default alarm or custom sound is set
+                    val fallbackUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                    setDataSource(applicationContext, fallbackUri)
+                } else {
+                    setDataSource(applicationContext, soundUri)
+                }
+
                 isLooping = true
                 prepareAsync()
                 setOnPreparedListener {
@@ -72,7 +80,7 @@ class AlarmService : Service() {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                // Handle error, maybe play a default sound
+                // Handle error
                 stopSelf()
             }
         }

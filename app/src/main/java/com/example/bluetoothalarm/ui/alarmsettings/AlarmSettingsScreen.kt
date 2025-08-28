@@ -1,5 +1,6 @@
 package com.example.bluetoothalarm.ui.alarmsettings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -19,6 +20,8 @@ fun AlarmSettingsScreen(
     onIsRecurringChange: (Boolean) -> Unit,
     selectedDays: Set<DayOfWeek>,
     onDaySelected: (DayOfWeek) -> Unit,
+    ringtoneName: String,
+    onSelectRingtoneClick: () -> Unit,
     timePickerState: TimePickerState,
     onSave: () -> Unit,
     onCancel: () -> Unit
@@ -72,6 +75,23 @@ fun AlarmSettingsScreen(
                 DaySelector(
                     selectedDays = selectedDays,
                     onDaySelected = onDaySelected
+                )
+            }
+
+            // Ringtone selector
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onSelectRingtoneClick)
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Ringtone")
+                Text(
+                    text = ringtoneName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }

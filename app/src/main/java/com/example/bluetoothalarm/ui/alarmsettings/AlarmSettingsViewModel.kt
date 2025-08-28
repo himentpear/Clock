@@ -24,14 +24,15 @@ class AlarmSettingsViewModel(
         minute: Int,
         name: String,
         isRecurring: Boolean,
-        recurringDays: Set<DayOfWeek>
+        recurringDays: Set<DayOfWeek>,
+        soundUri: String
     ) {
         val alarm = Alarm(
             id = Random.nextInt(),
             hour = hour,
             minute = minute,
             name = name,
-            soundUri = "", // TODO
+            soundUri = soundUri,
             isEnabled = true,
             isRecurring = isRecurring,
             recurringDays = recurringDays
