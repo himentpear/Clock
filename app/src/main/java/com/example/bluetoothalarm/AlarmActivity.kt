@@ -23,7 +23,7 @@ class AlarmActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        volumeControlStream = AudioManager.STREAM_ALARM
+        volumeControlStream = AudioManager.STREAM_MUSIC
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)

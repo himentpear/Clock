@@ -38,7 +38,7 @@ class AlarmService : Service() {
     private fun playSound(soundUriString: String?) {
         mediaPlayer?.release()
         mediaPlayer = MediaPlayer().apply {
-            setAudioStreamType(AudioManager.STREAM_ALARM)
+            setAudioStreamType(AudioManager.STREAM_MUSIC)
             try {
                 val soundUri: Uri? = if (soundUriString.isNullOrEmpty()) {
                     RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)

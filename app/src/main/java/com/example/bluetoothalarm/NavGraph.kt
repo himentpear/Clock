@@ -26,7 +26,9 @@ fun NavGraph(
     permissionsGranted: Boolean
 ) {
     val context = LocalContext.current
-    val factory = ViewModelFactory(context)
+    val factory = remember(context) {
+        ViewModelFactory(context)
+    }
     val navController = rememberNavController()
     val mainViewModel: MainViewModel = viewModel(factory = factory)
     val alarms by mainViewModel.alarms.collectAsState()
