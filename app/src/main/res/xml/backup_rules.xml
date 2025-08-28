@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="_8" standalone="yes"?>
+<full-backup-content>
+    <!--
+   In order to reduce backup size, you can specify files to include and exclude here.
+   For more information, see the following article:
+   https://developer.android.com/guide/topics/data/autobackup
+    -->
+    <include
+        domain="sharedpref"
+        path="." />
+    <exclude
+        domain="sharedpref"
+        path="device.xml" />
+</full-backup-content>
