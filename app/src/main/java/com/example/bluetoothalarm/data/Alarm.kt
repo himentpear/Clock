@@ -1,7 +1,9 @@
 package com.example.bluetoothalarm.data
 
+import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
 
+@Serializable
 /**
  * Represents an alarm.
  *

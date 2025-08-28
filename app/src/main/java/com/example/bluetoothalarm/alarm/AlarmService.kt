@@ -1,5 +1,6 @@
 package com.example.bluetoothalarm.alarm
 
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -16,6 +17,10 @@ import com.example.bluetoothalarm.R
 
 class AlarmService : Service() {
 
+    companion object {
+        const val ACTION_STOP = "STOP_ALARM"
+    }
+
     private var mediaPlayer: MediaPlayer? = null
     private lateinit var audioManager: AudioManager
 
@@ -29,15 +34,28 @@ class AlarmService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_STOP) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         val alarmName = intent?.getStringExtra("ALARM_NAME") ?: "Alarm"
         val soundUriString = intent?.getStringExtra("ALARM_SOUND_URI")
 
         createNotificationChannel()
 
+        val stopIntent = Intent(this, AlarmService::class.java).apply {
+            action = ACTION_STOP
+        }
+        val stopPendingIntent = PendingIntent.getService(
+            this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(this, "alarm_channel")
             .setContentTitle("Alarm")
             .setContentText(alarmName)
             .setSmallIcon(R.drawable.ic_alarm)
+            .addAction(R.drawable.ic_alarm, "Stop", stopPendingIntent)
             .build()
 
         startForeground(1, notification)

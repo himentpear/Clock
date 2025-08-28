@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.bluetoothalarm.alarm.AndroidAlarmScheduler
 import com.example.bluetoothalarm.repository.AlarmRepository
-import com.example.bluetoothalarm.repository.InMemoryAlarmRepository
+import com.example.bluetoothalarm.repository.JsonFileAlarmRepository
 import com.example.bluetoothalarm.ui.alarmsettings.AlarmSettingsViewModel
 import com.example.bluetoothalarm.ui.mainscreen.MainViewModel
 
@@ -13,7 +13,7 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
 
     // Create a single instance of the repository
     private val alarmRepository: AlarmRepository by lazy {
-        InMemoryAlarmRepository(AndroidAlarmScheduler(context.applicationContext))
+        JsonFileAlarmRepository(context.applicationContext, AndroidAlarmScheduler(context.applicationContext))
     }
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
