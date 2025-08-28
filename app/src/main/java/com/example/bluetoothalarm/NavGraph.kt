@@ -22,7 +22,9 @@ import java.time.DayOfWeek
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavGraph() {
+fun NavGraph(
+    permissionsGranted: Boolean
+) {
     val context = LocalContext.current
     val factory = ViewModelFactory(context)
     val navController = rememberNavController()
@@ -34,7 +36,8 @@ fun NavGraph() {
             MainScreen(
                 alarms = alarms,
                 onAddAlarmClick = { navController.navigate("settings") },
-                onAlarmEnabledChange = mainViewModel::onAlarmEnabledChange
+                onAlarmEnabledChange = mainViewModel::onAlarmEnabledChange,
+                permissionsGranted = permissionsGranted
             )
         }
         composable("settings") {

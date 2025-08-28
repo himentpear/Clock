@@ -1,14 +1,19 @@
 package com.example.bluetoothalarm.ui.mainscreen
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.bluetoothalarm.data.Alarm
 import com.example.bluetoothalarm.ui.theme.BluetoothAlarmTheme
 import java.time.DayOfWeek
@@ -17,7 +22,8 @@ import java.time.DayOfWeek
 fun MainScreen(
     alarms: List<Alarm>,
     onAddAlarmClick: () -> Unit,
-    onAlarmEnabledChange: (Alarm, Boolean) -> Unit
+    onAlarmEnabledChange: (Alarm, Boolean) -> Unit,
+    permissionsGranted: Boolean
 ) {
     Scaffold(
         floatingActionButton = {
@@ -26,11 +32,21 @@ fun MainScreen(
             }
         }
     ) { paddingValues ->
-        AlarmList(
-            alarms = alarms,
-            onAlarmEnabledChange = onAlarmEnabledChange,
-            modifier = Modifier.padding(paddingValues)
-        )
+        Column(Modifier.padding(paddingValues)) {
+            if (!permissionsGranted) {
+                Text(
+                    text = "Warning: Required permissions for notifications and Bluetooth are not granted. The alarm may not function correctly.",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                )
+            }
+            AlarmList(
+                alarms = alarms,
+                onAlarmEnabledChange = onAlarmEnabledChange
+            )
+        }
     }
 }
 
@@ -46,7 +62,8 @@ fun MainScreenPreview() {
         MainScreen(
             alarms = sampleAlarms,
             onAddAlarmClick = {},
-            onAlarmEnabledChange = { _, _ -> }
+            onAlarmEnabledChange = { _, _ -> },
+            permissionsGranted = true
         )
     }
 }
