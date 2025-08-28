@@ -1,23 +1,16 @@
 package com.example.bluetoothalarm.ui.alarmsettings
 
 import androidx.lifecycle.ViewModel
-import com.example.bluetoothalarm.alarm.AlarmScheduler
+import androidx.lifecycle.viewModelScope
 import com.example.bluetoothalarm.data.Alarm
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.example.bluetoothalarm.repository.AlarmRepository
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import kotlin.random.Random
 
 class AlarmSettingsViewModel(
-    private val alarmScheduler: AlarmScheduler
+    private val repository: AlarmRepository
 ) : ViewModel() {
-
-    private val _alarm = MutableStateFlow<Alarm?>(null)
-    val alarm: StateFlow<Alarm?> = _alarm
-
-    fun setAlarm(alarm: Alarm?) {
-        _alarm.value = alarm
-    }
 
     fun saveAlarm(
         hour: Int,
@@ -27,16 +20,18 @@ class AlarmSettingsViewModel(
         recurringDays: Set<DayOfWeek>,
         soundUri: String
     ) {
-        val alarm = Alarm(
-            id = Random.nextInt(),
-            hour = hour,
-            minute = minute,
-            name = name,
-            soundUri = soundUri,
-            isEnabled = true,
-            isRecurring = isRecurring,
-            recurringDays = recurringDays
-        )
-        alarmScheduler.schedule(alarm)
+        viewModelScope.launch {
+            val alarm = Alarm(
+                id = Random.nextInt(),
+                hour = hour,
+                minute = minute,
+                name = name,
+                soundUri = soundUri,
+                isEnabled = true,
+                isRecurring = isRecurring,
+                recurringDays = recurringDays
+            )
+            repository.addAlarm(alarm)
+        }
     }
 }
