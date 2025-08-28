@@ -11,9 +11,11 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.bluetoothalarm.ui.alarmsettings.AlarmSettingsScreen
 import com.example.bluetoothalarm.ui.alarmsettings.AlarmSettingsViewModel
 import com.example.bluetoothalarm.ui.mainscreen.MainScreen
@@ -38,24 +40,50 @@ fun NavGraph(
             MainScreen(
                 alarms = alarms,
                 onAddAlarmClick = { navController.navigate("settings") },
+                onItemClick = { alarm ->
+                    navController.navigate("settings?alarmId=${alarm.id}")
+                },
                 onAlarmEnabledChange = mainViewModel::onAlarmEnabledChange,
+                onDeleteClick = mainViewModel::deleteAlarm,
                 permissionsGranted = permissionsGranted
             )
         }
-        composable("settings") {
-            val alarmSettingsViewModel: AlarmSettingsViewModel = viewModel(factory = factory)
-            var alarmName by remember { mutableStateOf("") }
-            var isRecurring by remember { mutableStateOf(false) }
-            var selectedDays by remember { mutableStateOf(emptySet<DayOfWeek>()) }
-            val timePickerState = rememberTimePickerState()
+        composable(
+            route = "settings?alarmId={alarmId}",
+            arguments = listOf(navArgument("alarmId") {
+                type = NavType.StringType
+                nullable = true
+            })
+        ) { backStackEntry ->
+            val alarmIdStr = backStackEntry.arguments?.getString("alarmId")
+            val alarmId = alarmIdStr?.toIntOrNull()
 
-            var selectedRingtoneUri by remember { mutableStateOf<Uri?>(null) }
+            val alarmSettingsViewModel: AlarmSettingsViewModel = viewModel(factory = factory)
+
+            LaunchedEffect(alarmId) {
+                if (alarmId != null) {
+                    alarmSettingsViewModel.loadAlarm(alarmId)
+                }
+            }
+
+            val loadedAlarm by alarmSettingsViewModel.alarmState.collectAsState()
+
+            var alarmName by remember(loadedAlarm) { mutableStateOf(loadedAlarm?.name ?: "") }
+            var isRecurring by remember(loadedAlarm) { mutableStateOf(loadedAlarm?.isRecurring ?: false) }
+            var selectedDays by remember(loadedAlarm) { mutableStateOf(loadedAlarm?.recurringDays ?: emptySet()) }
+            val timePickerState = rememberTimePickerState(
+                initialHour = loadedAlarm?.hour ?: 0,
+                initialMinute = loadedAlarm?.minute ?: 0
+            )
+            var selectedRingtoneUri by remember(loadedAlarm) { mutableStateOf(loadedAlarm?.soundUri?.let { Uri.parse(it) }) }
+
             val ringtoneName by remember(selectedRingtoneUri) {
                 derivedStateOf {
+                    val defaultTitle = RingtoneManager.getRingtone(context, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))?.getTitle(context) ?: "Default"
                     if (selectedRingtoneUri != null) {
                         RingtoneManager.getRingtone(context, selectedRingtoneUri).getTitle(context)
                     } else {
-                        "Default"
+                        defaultTitle
                     }
                 }
             }
@@ -77,11 +105,7 @@ fun NavGraph(
                 onIsRecurringChange = { isRecurring = it },
                 selectedDays = selectedDays,
                 onDaySelected = { day ->
-                    selectedDays = if (selectedDays.contains(day)) {
-                        selectedDays - day
-                    } else {
-                        selectedDays + day
-                    }
+                    selectedDays = if (selectedDays.contains(day)) selectedDays - day else selectedDays + day
                 },
                 ringtoneName = ringtoneName,
                 onSelectRingtoneClick = {
@@ -90,7 +114,8 @@ fun NavGraph(
                 },
                 timePickerState = timePickerState,
                 onSave = {
-                    alarmSettingsViewModel.saveAlarm(
+                    alarmSettingsViewModel.saveOrUpdateAlarm(
+                        id = alarmId,
                         hour = timePickerState.hour,
                         minute = timePickerState.minute,
                         name = alarmName,

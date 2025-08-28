@@ -25,4 +25,10 @@ class MainViewModel(
             repository.updateAlarm(alarm.copy(isEnabled = isEnabled))
         }
     }
+
+    fun deleteAlarm(alarm: Alarm) {
+        viewModelScope.launch {
+            repository.deleteAlarm(alarm)
+        }
+    }
 }

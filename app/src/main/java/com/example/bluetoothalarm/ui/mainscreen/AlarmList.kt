@@ -10,6 +10,8 @@ import com.example.bluetoothalarm.data.Alarm
 fun AlarmList(
     alarms: List<Alarm>,
     onAlarmEnabledChange: (Alarm, Boolean) -> Unit,
+    onDeleteClick: (Alarm) -> Unit,
+    onItemClick: (Alarm) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
@@ -18,6 +20,12 @@ fun AlarmList(
                 alarm = alarm,
                 onEnabledChange = { isEnabled ->
                     onAlarmEnabledChange(alarm, isEnabled)
+                },
+                onDeleteClick = {
+                    onDeleteClick(alarm)
+                },
+                onClick = {
+                    onItemClick(alarm)
                 }
             )
         }

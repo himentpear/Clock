@@ -48,6 +48,10 @@ class JsonFileAlarmRepository(
 
     override fun getAlarms(): Flow<List<Alarm>> = _alarms.asStateFlow()
 
+    override suspend fun getAlarmById(id: Int): Alarm? {
+        return _alarms.value.find { it.id == id }
+    }
+
     override suspend fun addAlarm(alarm: Alarm) {
         _alarms.update { currentAlarms ->
             currentAlarms + alarm
@@ -68,5 +72,13 @@ class JsonFileAlarmRepository(
         } else {
             alarmScheduler.cancel(alarm)
         }
+    }
+
+    override suspend fun deleteAlarm(alarm: Alarm) {
+        _alarms.update { currentAlarms ->
+            currentAlarms.filterNot { it.id == alarm.id }
+        }
+        writeToFile()
+        alarmScheduler.cancel(alarm)
     }
 }

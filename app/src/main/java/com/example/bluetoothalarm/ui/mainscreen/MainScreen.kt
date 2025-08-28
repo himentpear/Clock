@@ -23,6 +23,8 @@ fun MainScreen(
     alarms: List<Alarm>,
     onAddAlarmClick: () -> Unit,
     onAlarmEnabledChange: (Alarm, Boolean) -> Unit,
+    onDeleteClick: (Alarm) -> Unit,
+    onItemClick: (Alarm) -> Unit,
     permissionsGranted: Boolean
 ) {
     Scaffold(
@@ -44,7 +46,9 @@ fun MainScreen(
             }
             AlarmList(
                 alarms = alarms,
-                onAlarmEnabledChange = onAlarmEnabledChange
+                onAlarmEnabledChange = onAlarmEnabledChange,
+                onDeleteClick = onDeleteClick,
+                onItemClick = onItemClick
             )
         }
     }
@@ -63,6 +67,8 @@ fun MainScreenPreview() {
             alarms = sampleAlarms,
             onAddAlarmClick = {},
             onAlarmEnabledChange = { _, _ -> },
+            onDeleteClick = {},
+            onItemClick = {},
             permissionsGranted = true
         )
     }
